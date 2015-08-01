@@ -13,13 +13,21 @@ exports.load = function(req, res, next, quizId) {
 };
 
 // GET /quizes
-exports.index = function(req, res) {
-  models.Quiz.findAll().then(
-    function(quizes) {
-      res.render('quizes/index.ejs', {quizes: quizes, errors: []});
-    }
-  ).catch(function(error){next(error)});
-};
+exports.index = function(req, res){
+    var filters = {};
+    var q = req.query.q || '';
+
+    if (q)
+        filters = {
+            where: {
+                pregunta:{like: '%' + q + '%'}
+            }
+        }
+
+    models.Quiz.findAll(filters).then(function(quizes){
+        res.render('quizes/index', {quizes: quizes, q: q});
+    });
+}
 
 // GET /quizes/:id
 exports.show = function(req, res) {
